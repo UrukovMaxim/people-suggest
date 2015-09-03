@@ -18,7 +18,8 @@ export default class Person extends Component {
 
                 <div className={`${b}__avatar`}>
                     <img
-                    src={'//static.synccloud.com/avatars/m/49f0bbd5_1c22_4f37_813c_c2da33d195e6.jpg'}
+                    src={person.avatarUrl}
+
                     title={person.fullName} className={`b-avatar ${b}__avatar-img b-avatar_size_m`}/>
                     <div className={`${b}__selected-avatar-img b-avatar b-avatar_size_m b-avatar_empty_yes`}>
                         <div className={`${b}__selected-avatar-icon`}>
