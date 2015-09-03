@@ -7,6 +7,7 @@ import PersonStore from '../stores/person';
 import SuggestStore from '../stores/suggest';
 import PersonActions from '../actions/person';
 import PersonList from '../components/person-list';
+import SuggestInput from '../components/suggest-input';
 
 const cx = React.addons.classSet;
 const ComponentBase = mixins(ListenerMixin);
@@ -16,15 +17,21 @@ function getState() {
     const allGroups = SuggestStore.getState().groups;
     const allPersons = PersonStore.getState().persons;
 
-    const groups = {
-        frequent: processGroup(_.find(allGroups, {kind: 'frequent'})),
-        projectParticipants: processGroup(_.find(allGroups, {kind: 'project_participants'})),
-        projectMembers: processGroup(_.find(allGroups, {kind: 'project_members'}))
-    };
+    const groups = ['frequent', 'project_participants', 'project_members', 'team_members', 'team_participants', 'task_members']
+        .reduce((dic, kind) => {
+            const group = _.find(allGroups, {kind});
+
+            if (group) {
+                dic[kind] = processGroup(group);
+            }
+            return dic;
+        }, {});
 
     const teams = _.where(allGroups, {kind: 'team'}).map((team) => {
-        team.hasProjectParticipants = _.intersection(groups.projectParticipants.persons, team.persons);
-        team.hasProjectMembers = _.intersection(groups.projectMembers.persons, team.persons);
+        const participantsGroup = groups['project_participants'] || groups['team_participants'];
+        const membersGroup = groups['project_members'] || groups['team_members'];
+        team.hasParticipants = !!participantsGroup && _.intersection(participantsGroup.persons, team.persons);
+        team.hasMembers = !!membersGroup && _.intersection(membersGroup.persons, team.persons);
         team.persons = team.persons.map((id) => allPersons[id]);
         return team;
     });
@@ -48,7 +55,7 @@ class PeopleSuggest extends ComponentBase {
 
     state = _.assign(getState(), {
         selectedGroup: {kind: 'frequent'},
-        mode: 'full'
+        mode: 'full',
     });
 
     componentDidMount() {
@@ -72,31 +79,39 @@ class PeopleSuggest extends ComponentBase {
         this.setState({selectedGroup: {kind: 'team', id}})
     };
 
+    _handleSearch = (text) => {
+        this.setState({searchBy: text});
+    };
+
     render() {
-        const {mode, groups, teams, selectedGroup} = this.state;
+        const {mode, groups, teams, selectedGroup, searchBy} = this.state;
         const {className} = this.props;
 
-        const {persons} = selectedGroup.kind == 'team' ? _.find(teams, {id: selectedGroup.id}) : groups[selectedGroup.kind];
+        let personGroups = [];
 
-        const groupItems = _.pairs(groups).map(([groupName, group]) => {
-            let title = '';
-
-            switch (groupName) {
-                case 'frequent':
-                    title = 'Frequent contacts';
-                    break;
-                case 'projectParticipants':
-                    title = 'Project participants';
-                    break;
-                case 'projectMembers':
-                    title = 'Project members';
-                    break;
+        if (mode == 'full') {
+            if (searchBy) {
+            } else {
+                const grp = selectedGroup.kind == 'team' ? _.find(teams, {id: selectedGroup.id}) : groups[selectedGroup.kind];
+                personGroups = [{title: grp.kind == 'team' ? grp.name : titleByGroupKind(grp.kind), persons: grp.persons}];
             }
+        } else {
+            if (searchBy) {
+
+            } else {
+                personGroups = [{title: titleByGroupKind('frequent'), persons: groups.frequent.persons}];
+            }
+        }
+
+        const groupItems = _.pairs(groups).map(([kind, group]) => {
+            let title = titleByGroupKind(kind);
 
             return (
-                <div ref={groupName} className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_selected_${selectedGroup.kind==groupName}`)} onClick={this._handleGroupSelect.bind(this, groupName)}>
+                <div ref={kind}
+                     className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_selected_${selectedGroup.kind==kind}`)}
+                     onClick={this._handleGroupSelect.bind(this, kind)}>
                     <div className={`${b}__group-item-icon`}>
-                        <div className={`b-icon-sc b-icon-sc_img_crown-on ${b}__${groupName}-members-icon`}></div>
+                        <div className={`b-icon-sc b-icon-sc_img_crown-on ${b}__${kind}-members-icon`}></div>
                     </div>
                     <div className={`${b}__group-info`}>{title} · {group.persons.length}</div>
                     <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
@@ -113,17 +128,17 @@ class PeopleSuggest extends ComponentBase {
         const teamItems = teams.map((team) => {
             const title = team.personal ? 'Personal contacts' : team.name;
             const abbr = title.split(/\s+/).map((s)=>s[0].toUpperCase()).join('');
-            const hasProjectParticipants = team.hasProjectParticipants ? (
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
-                        <div className="b-icon-sc b-icon-sc_img_person"></div>
-                    </div>
-                )
+            const hasParticipants = team.hasParticipants ? (
+                <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
+                    <div className="b-icon-sc b-icon-sc_img_person"></div>
+                </div>
+            )
                 : '';
-            const hasProjectMembers = team.hasProjectMembers.length ? (
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
-                        <div className="b-icon-sc b-icon-sc_img_person"></div>
-                    </div>
-                )
+            const hasMembers = team.hasMembers.length ? (
+                <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
+                    <div className="b-icon-sc b-icon-sc_img_person"></div>
+                </div>
+            )
                 : '';
 
             return (
@@ -133,35 +148,57 @@ class PeopleSuggest extends ComponentBase {
                     <div style={{backgroundColor: team.avatar.color}} data-abbr={abbr}
                          className={`${b}__group-item-avatar b-avatar b-avatar_size_m b-avatar_empty_yes`}></div>
                     <div className={`${b}__group-info`}>{title} · {team.persons.length}</div>
-                    {hasProjectParticipants}
-                    {hasProjectMembers}
+                    {hasParticipants}
+                    {hasMembers}
                 </div>
             )
         });
 
         return (
-            <div className={cx(className, b, `${b}_mode_${mode}`)}>
-                <div className={`${b}__content`}>
-                    <div className={`${b}__left-column`}>
-                        {groupItems}
-                        <div className={`${b}__group`}>
-                            My teams
-                            <div className={`${b}__group-icon`}>
-                                <div className="b-icon-sc b-icon-sc_img_person"></div>
-                            </div>
-                        </div>
-                        {teamItems}
-                    </div>
-                    <div className={`${b}__right-column`}>
-                        <PersonList persons={persons}/>
-                    </div>
+            <div>
+                <div>
+                    <SuggestInput onChange={this._handleSearch}/>
                 </div>
+                <div className={cx(className, b, `${b}_mode_${mode}`)}>
+                    <div className={`${b}__content`}>
+                        <div className={`${b}__left-column`}>
+                            {groupItems}
+                            <div className={`${b}__group`}>
+                                My teams
+                                <div className={`${b}__group-icon`}>
+                                    <div className="b-icon-sc b-icon-sc_img_person"></div>
+                                </div>
+                            </div>
+                            {teamItems}
+                        </div>
+                        <div className={`${b}__right-column`}>
+                            <PersonList persons={personGroups}/>
+                        </div>
+                    </div>
 
-                <div className={`${b}__toggle-button`} onClick={this._handleChangeMode}>
-                    <div className="b-icon-sc b-icon-sc_img_close-box"></div>
+                    <div className={`${b}__toggle-button`} onClick={this._handleChangeMode}>
+                        <div className="b-icon-sc b-icon-sc_img_close-box"></div>
+                    </div>
                 </div>
             </div>
         )
+    }
+}
+
+function titleByGroupKind(kind) {
+    switch (kind) {
+        case 'frequent':
+            return 'Frequent contacts';
+        case 'project_participants':
+            return 'Project participants';
+        case 'project_members':
+            return 'Project members';
+        case 'team_members':
+            return 'Team members';
+        case 'team_participants':
+            return 'Team participants';
+        case 'task_members':
+            return 'Task members';
     }
 }
 

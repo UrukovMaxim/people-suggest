@@ -1,9 +1,10 @@
-import React from 'react';
+import React from 'react/addons';
+
+const cx = React.addons.classSet;
+const b = 'project-list';
 
 export default class PeopleSuggest extends React.Component {
     render() {
-        const state = this.state;
-
         return (
             <div className='people-suggest'>
                 My suggest

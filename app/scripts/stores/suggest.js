@@ -4,7 +4,7 @@ import suggestData from '../data/suggest';
 //import PersonActions from '../actions/person';
 import {indexBy} from 'lodash';
 
-class PersonStore {
+class SuggestStore {
     constructor() {
         //this.bindActions(PersonActions);
 
@@ -12,4 +12,4 @@ class PersonStore {
     }
 }
 
-export default alt.createStore(PersonStore);
+export default alt.createStore(SuggestStore);
