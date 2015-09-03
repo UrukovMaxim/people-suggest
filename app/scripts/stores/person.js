@@ -7,7 +7,7 @@ class PersonStore {
     constructor() {
         this.bindActions(PersonActions);
 
-        this.persons = {};
+        this.persons = indexBy(require('../data/persons'), 'id');
     }
     onFetch() {
         // reset the array while we're fetching new locations so React can

@@ -31,10 +31,11 @@ gulp.task('moveCss',['clean'], function(){
 });
 
 gulp.task('less', function() {
-    return gulp.src('./app/styles')
+    return gulp.src('./app/styles/*.less')
         .pipe($.less({
             plugins: [new LessPluginAutoPrefix({ browsers: ["last 2 versions"] })]
         }))
+        .pipe($.concat('main.css'))
         .pipe(gulp.dest('dist/styles'))
         .pipe($.size());
 });
@@ -182,7 +183,7 @@ gulp.task('watch', ['html', 'fonts', 'bundle'], function() {
     // Watch .html files
     gulp.watch('app/*.html', ['html']);
 
-    gulp.watch(['app/styles/**/*.scss', 'app/styles/**/*.css'], ['styles', 'scripts', reload]);
+    gulp.watch(['app/styles/**/*.less', 'app/styles/**/*.css'], ['styles', 'scripts', reload]);
 
 
 

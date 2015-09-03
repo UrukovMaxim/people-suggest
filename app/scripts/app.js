@@ -9,7 +9,7 @@ const App = React.createClass({
   },
   render: function() {
     return (
-      <Suggest/>
+      <Suggest className='suggest1'/>
     );
   }
 });

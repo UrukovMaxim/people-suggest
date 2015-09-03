@@ -1,0 +1,244 @@
+//
+//
+//
+// Variables
+// --------------------------------------------------
+
+
+@pageWidth: 1020px;
+@module-size: 9px;
+@body-bg:               #fff;
+@c-font-default:          #000;
+@base-line-height:      @module-size*2;
+
+@border-radius-base:    4px;
+
+//dialogs
+@dlg-save-doc-width: 420px;
+
+//  Main colors
+@c-primary-orange: #e74c3c;
+@c-primary-carrot: #F4511E;
+@c-primary-nephrit: #00796B;
+@c-primary-gray2: #A6AFBD;
+@c-primary-sky: #039BE5;
+@c-primary-blue: #00a6eb;
+@c-primary-green: #1abc9c;
+@c-primary-midnight: #252c3f;
+@c-primary-night: #1B1F28;
+@c-primary-gray: #eee;
+@c-primary-silver: #a6afbd;
+@c-primary-dark: #222229;
+@c-steel: #dde3ec;
+@c-stale: #393c41;
+@c-new-blue: #29b6f6;
+
+@c-red: #f53333;
+@c-deep-red: #e10000;
+@c-light-blue: #00a6eb;
+@c-dark-blue: #003959;
+@c-dark-ocean-blue: #252c3f;
+@c-dark-navy: #1b1f28;
+@c-light-ocean-blue: lighten(@c-ocean-blue, 3%);
+@c-ocean-blue:      #0f7caf;
+@c-backdrop-grey: #eee;
+@c-backdrop-steel: #eaeef5;
+@c-extra-light-gray: #f8f8f8;
+@c-light-gray: #eee;
+@c-medium-gray: #bbb;
+@c-dark-gray: #555;
+@c-sidebar-color: #7d8091;
+@c-theme-orange: #e95d50;
+@c-theme-blue: #00a6eb;
+@c-theme-white: #fff;
+@c-theme-gray-blue: #94a2b5;
+@c-theme-gray-blue-light: #cfd6dc;
+@c-theme-gray-blue-extra-light: lighten(@c-theme-gray-blue-light, 13%);
+
+
+@c-bg-steel1: #eff1f6;
+@c-bg-steel2: #f7f8fa;
+
+@c-border-steel1: #bec5cf;
+@c-border-steel2: #dde3ec;
+@c-border-steel-dark: @c-sidebar-color;
+@c-border-gray: #e5e5e5;
+@c-border-gray-light: #eee;
+
+@c-text-midnight: #252c3f;
+@c-text-steel-pale: #b5b8c4;
+@c-text-steel: darken(@c-steel, 30%);
+@c-text-steel-light: darken(@c-steel, 8%);
+@c-text-stale: @c-stale;
+@c-text-stale-light: lighten(@c-stale, 20%);
+@c-text-stale-extra-light: lighten(@c-stale, 40%);
+@c-text-light-gray: #aaa;
+@c-text-gray: #999;
+
+//Colors from Aaron Sanaes's template
+@c-text-2: #717d90;
+@c-text-3: #bec1c7;
+@c-text-4: #8a969f;
+@c-border: #f2f3f4;
+@c-underlay-stale: #f7f9fa;
+
+
+// Badges color
+@c-badge-gray: #e2e2e2;
+@c-badge-yellow: #f8ed8a;
+@c-badge-orange: #f6d6b7;
+@c-badge-red: #f6caca ;
+@c-badge-green: #f6caca;
+@c-badge-cyan: #f6caca;
+@c-badge-blue-green: #b6e2e5;
+@c-badge-blue: #c1d7f5;
+@c-badge-light-purple: #d4cbf3;
+@c-badge-purple: #f5c6f0;
+
+
+@c-border-gray-light:   #eee;
+@c-border-gray:   #e2e2e2;
+@c-border-dark-gray:   #c6c6c6;
+
+
+@c-docs-sidemenu: #31384a;
+
+// Typography
+// -------------------------
+
+@font-family-base:              'Open Sans', Segoe UI, Arial, Verdana;
+@font-size-base:                12px;
+@font-family-roboto:             Roboto, "Open Sans", "Helvetic Neue", Helvetica, Arial;
+@font-size-l:                   1.2em;
+@font-size-m:                   1.07em;
+@font-size-s:                   .9em;
+@font-size-xs:                  .8em;
+@font-size-xss:                 .75em;
+
+// Controls
+// -------------------------
+
+@c-defaultLinkColor:              @c-theme-blue;
+
+@headerHeight:                  @module-size*6;
+@sidebarWidth:                  @module-size*10;
+@sidebar2Width:                 80px;
+
+@control-font-size-xs:          11px;
+@control-font-size-s:           12px;
+@control-font-size-m:           13px;
+@control-font-size-l:           14px;
+@control-font-size-xl:          15px;
+@control-text-color:            @c-dark-gray;
+
+@control-height-xs:             22px;
+@control-height-s:              26px;
+@control-height-m:              30px;
+@control-height-l:              34px;
+@control-height-xl:             44px;
+
+//Avatar sizes
+@avatar-size-xs:                20px;
+@avatar-size-s:                 24px;
+@avatar-size-m:                 32px;
+@avatar-size-l:                 100px;
+@avatar-size-xl:                120px;
+
+//Button-circle font sizes
+@button-circle-font-size-xs:    @control-font-size-xs;
+@button-circle-font-size-s:     @control-font-size-s + 2px;
+@button-circle-font-size-m:     @control-font-size-m + 2px;
+@button-circle-font-size-l:     @control-font-size-l + 2px;
+@button-circle-font-size-xl:    @control-font-size-xl + 3px;
+
+//@z-indexes
+@zIndexPageHeader:              999;
+@zIndexDropdown:                1050;//???сделал выше чем у диалога, изначально было 1000, непонятно почему они сделали ниже диалога индекс дропдаунов если например дропдаун может быть в диалоге?
+@zIndexPopover:                 1010;
+@zIndexTooltip:                 1020;
+@zIndexFixedNavbar:             1030;
+@zIndexDialogBackdrop:          1040;
+@zIndexDialog:                  1050;
+@zIndexComboBox:                1060;
+
+// Forms
+// -------------------------
+
+@input-bg:                       #fafafa;
+@input-bg-focus:                 #fff;
+@input-bg-error:                 #fff;
+@input-bg-disabled:              #fcfcfc;
+
+@input-border:                   #c9c9c9;
+@input-border-top:               #b1b1b1;
+@input-border-focus:             #51a7e8;
+@input-border-error:             #f15757;
+@input-border-disabled:          #e4e4e4;
+
+@input-border-radius:            @border-radius-base;
+
+@input-color-disabled:           #cfcfcf;
+
+//
+//Media queries breakpoints
+// --------------------------------------------------
+
+// Extra small screen / phone
+// Note: Deprecated @screen-xs and @screen-phone as of v3.0.1
+
+
+@screen-xs: 480px;
+@screen-xs-min: @screen-xs;
+@screen-phone: @screen-xs-min;
+
+// Small screen / tablet
+// Note: Deprecated @screen-sm and @screen-tablet as of v3.0.1
+@screen-sm: 768px;
+@screen-sm-min: @screen-sm;
+@screen-tablet: @screen-sm-min;
+
+// Medium screen / desktop
+// Note: Deprecated @screen-md and @screen-desktop as of v3.0.1
+@screen-md: 992px;
+@screen-md-min: @screen-md;
+@screen-desktop: @screen-md-min;
+
+// Large screen / wide desktop
+// Note: Deprecated @screen-lg and @screen-lg-desktop as of v3.0.1
+@screen-lg: 1320px;
+
+@screen-lg-min: @screen-lg;
+@screen-lg-desktop: @screen-lg-min;
+
+// So media queries don't overlap when required, provide a maximum
+@screen-xs-max: (@screen-sm-min - 1);
+@screen-sm-max: (@screen-md-min - 1);
+@screen-md-max: (@screen-lg-min - 1);
+
+// Grid system
+// --------------------------------------------------
+
+// Number of columns in the grid system
+@grid-columns: 12;
+// Padding, to be divided by two and applied to the left and right of all columns
+@grid-gutter-width: 30px;
+// Point at which the navbar stops collapsing
+@grid-float-breakpoint: @screen-sm-min;
+
+// Container sizes
+// --------------------------------------------------
+
+// Small screen / tablet
+@container-tablet: ((720px + @grid-gutter-width));
+@container-sm: @container-tablet;
+
+// Medium screen / desktop
+@container-desktop: ((940px + @grid-gutter-width));
+@container-md: @container-desktop;
+
+// Large screen / wide desktop
+@container-large-desktop: ((1140px + @grid-gutter-width));
+@container-lg: @container-large-desktop;
+
+
+

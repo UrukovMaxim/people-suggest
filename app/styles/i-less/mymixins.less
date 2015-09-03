@@ -1,0 +1,301 @@
+@import (reference) 'variables';
+@import (reference) 'mixins';
+
+//.keyframes (@name, @frames) {
+//    @-webkit-keyframes @name {@frames()}
+//    @-moz-keyframes @name {@frames()}
+//    @-ms-keyframes @name {@frames()}
+//    @-o-keyframes @name {@frames()}
+//    @keyframes @name {@frames()}
+//}
+
+.font-smoothing(@value) {
+    -webkit-font-smoothing: @value;
+    -moz-font-smoothing: @value;
+    -ms-font-smoothing: @value;
+    font-smoothing: @value;
+}
+
+.clean-input-style() {
+    border: none;
+    outline: none;
+    color: inherit;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+/**
+    LAYOUT
+**/
+.absolute(@p:0) {
+    position: absolute;
+    top: @p;
+    left: @p;
+    right: @p;
+    bottom: @p;
+}
+
+.absolute(@t,@r,@b,@l) {
+    position: absolute;
+    top: @t;
+    left: @l;
+    right: @r;
+    bottom: @b;
+}
+
+.absolute-right(@r:0) {
+    position: absolute;
+    right: @r;
+    top: 0;
+    bottom: 0;
+}
+
+.absolute-left(@l:0) {
+    position: absolute;
+    left: @l;
+    top: 0;
+    bottom: 0;
+}
+
+.absolute-top(@t:0) {
+    position: absolute;
+    left: 0;
+    top: @t;
+    right: 0;
+}
+
+.absolute-bottom(@b:0) {
+    position: absolute;
+    left: 0;
+    bottom: @b;
+    right: 0;
+}
+
+.absolute-bottom-left(@b:0, @l:0) {
+    position: absolute;
+    left: @l;
+    bottom: @b;
+}
+
+.absolute-bottom-right(@b:0, @l:0) {
+    position: absolute;
+    right: @l;
+    bottom: @b;
+}
+
+.absolute-left-center(@h) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 50%;
+    margin-top: -@h/2;
+}
+
+.absolute-right-center(@h) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    top: 50%;
+    margin-top: -@h/2;
+}
+
+.absolute-top-right(@t:0, @r:0) {
+    position: absolute;
+    right: @r;
+    top: @t;
+}
+
+.absolute-top-left(@t:0, @l:0) {
+    position: absolute;
+    left: @l;
+    top: @t;
+}
+
+.fixed(@p:0) {
+    position: fixed;
+    top: @p;
+    left: @p;
+    right: @p;
+    bottom: @p;
+}
+
+//обрезает текст внутри блока
+.inner_text_truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+
+.background-size (...) {
+    -webkit-background-size: @arguments;
+    -moz-background-size: @arguments;
+    -o-background-size: @arguments;
+    background-size: @arguments;
+}
+
+.input-size(@f, @h) {
+    font-size: @f;
+    height: @h;
+    line-height: @f*1.5;
+    padding: 0 @h/2.5;
+}
+
+.input-size(@size) {
+    @control-font-size: 'control-font-size-@{size}';
+    @control-height: 'control-height-@{size}';
+    .input-size(@@control-font-size, @@control-height);
+}
+
+.btn-padding(@h) {
+    padding: 0 @h/2.5;
+}
+
+.btn-size(@size) {
+    @control-font-size: 'control-font-size-@{size}';
+    @control-height: 'control-height-@{size}';
+    .btn-size(@@control-font-size, @@control-height);
+}
+
+.btn-size(@f, @h) {
+    font-size: @f;
+    line-height: @h - 2; //изза бордера, чтобы текст был по центру
+    height: @h;
+    .btn-padding(@h);
+}
+
+// Задает border-radius для групп кнопок при горизонтальном позиционировании
+.border-button-group-h() {
+
+    &:first-child {
+        .border-bottom-right-radius(0);
+        .border-top-right-radius(0);
+    }
+
+    &:last-child {
+        .border-bottom-left-radius(0);
+        .border-top-left-radius(0);
+        margin-left: -1px;
+    }
+
+    &:not(:first-child):not(:last-child) {
+        .border-radius(0);
+        margin-left: -1px;
+    }
+}
+
+// Задает border-radius для групп кнопок при вертикальном позиционировании
+.border-button-group-v() {
+
+    &:first-child {
+        .border-bottom-right-radius(0);
+        .border-bottom-left-radius(0);
+    }
+
+    &:last-child {
+        .border-top-right-radius(0);
+        .border-top-left-radius(0);
+        margin-top: -1px;
+    }
+
+    &:not(:first-child):not(:last-child) {
+        .border-radius(0);
+        margin-top: -1px;
+    }
+}
+
+.scrollbar(@color, @size: 6px) {
+    &::-webkit-scrollbar {
+        height: @size;
+        overflow: visible;
+        width: @size;
+        background: transparent;
+    }
+    &::-webkit-scrollbar-button {
+        height: 0;
+        width: 0;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-clip: padding-box;
+        border: none;
+        .border-radius(3px);
+        min-height: 28px;
+        padding: 100px 0 0;
+        background-color: @color;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        border-color: darken(@color, 14%);
+        background-color: darken(@color, 5%);
+    }
+    &::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-track {
+        background-clip: padding-box;
+        border: solid transparent;
+    }
+
+    scrollbar-face-color: @color;
+    scrollbar-highlight-color: #fff;
+    scrollbar-3dlight-color: darken(@color, 10%);
+    scrollbar-darkshadow-color: #fff;
+    scrollbar-shadow-color: transparent;
+    scrollbar-arrow-color: white;
+    scrollbar-track-color: transparent;
+}
+
+
+//http://css-tricks.com/uniqlo-stripe-hovers/
+.strips-animation(@stripSize:20px, @duration: 0.3s, @fill: linear){
+    background-size: @stripSize @stripSize;
+    background-image: linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.1) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.1) 50%,
+            rgba(0, 0, 0, 0.1) 75%,
+            transparent 75%,
+            transparent
+    );
+
+    .animation(barberpole @duration @fill infinite);
+}
+
+.hide-placeholder() {
+    &:focus::-webkit-input-placeholder {color: transparent}
+    &:focus::-moz-placeholder          {color: transparent}
+    &:focus:-moz-placeholder           {color: transparent}
+    &:focus:-ms-input-placeholder      {color: transparent}
+}
+
+// @media для различный устройств
+// Phones
+@media screen and (max-width: 7in)
+{
+
+}
+
+// Tablets
+@media screen and (min-width: 7in) and (max-width: 12in) {
+
+}
+
+// Laptop
+@media screen and (min-width: 12in) and (max-width: 17in) {
+
+}
+
+// Desktop
+@media screen and (min-width: 17in) and (max-width: 24in) {
+
+}
+
+// HD Desktop
+.media-hd-desktop () {
+    @media screen and (min-width: 24in) {
+
+    }
+}

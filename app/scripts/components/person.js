@@ -12,7 +12,7 @@ export default class Person extends Component {
 
         return (
             <div className='person'>
-                {person.name}
+                <div className="person__name">{person.name}</div>
             </div>
         )
     }

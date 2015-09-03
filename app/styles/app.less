@@ -1,0 +1,30 @@
+@import (reference) "./i-less/variables.less";
+@import (reference) "./i-less/mixins.less";
+@import (reference) "./i-less/mymixins.less";
+@import (reference)"./i-less/fonts.less";
+
+* {
+    .box-sizing(border-box);
+}
+
+html {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    .absolute();
+    overflow: hidden;
+}
+
+.font-roboto();
+
+body {
+    line-height: @base-line-height;
+    font-family: @font-family-roboto;
+    font-size: 16px;
+    color: #2B303A;
+    .absolute();
+    overflow: hidden;
+    padding: 50px;
+}
+
+.suggest1 {
+    top: 50px;
+}
