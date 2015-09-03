@@ -7,6 +7,7 @@
     "bluebird": "^2.9.34",
     "es6-react-mixins": "^0.1.8",
     "gulp-less": "^3.0.3",
+    "immutable": "^3.7.5",
     "lodash": "^3.10.1",
     "react-mixin": "^1.7.0"
   },

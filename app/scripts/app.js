@@ -10,7 +10,8 @@ const App = React.createClass({
   render: function() {
     return (
         <div>
-            <Suggest className='suggest1'/>
+            <Suggest className='suggest1' multiSelect={true}/>
+
         </div>
     );
   }

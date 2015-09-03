@@ -8,10 +8,12 @@ import SuggestStore from '../stores/suggest';
 import PersonActions from '../actions/person';
 import PersonList from '../components/person-list';
 import SuggestInput from '../components/suggest-input';
+import {List, Map} from 'immutable';
 
 const cx = React.addons.classSet;
 const ComponentBase = mixins(ListenerMixin);
 const b = 'people-suggest';
+const DEFAULT_GROUP = 'frequent';
 
 function getState() {
     const allGroups = SuggestStore.getState().groups;
@@ -50,12 +52,19 @@ function getState() {
 class PeopleSuggest extends ComponentBase {
     static propTypes = {
         onClose: PropTypes.func,
-        onSelect: PropTypes.func
+        onSelect: PropTypes.func,
+        multiSelect: PropTypes.bool
+    };
+
+    static defaultProps = {
+        multiSelect: false
     };
 
     state = _.assign(getState(), {
-        selectedGroup: {kind: 'frequent'},
+        selectedGroup: {kind: DEFAULT_GROUP},
         mode: 'full',
+        selected: [],
+        searchBy: ''
     });
 
     componentDidMount() {
@@ -80,35 +89,139 @@ class PeopleSuggest extends ComponentBase {
     };
 
     _handleSearch = (text) => {
-        this.setState({searchBy: text});
+        const {multiSelect} = this.props;
+        let {selected, searchBy} = this.state;
+
+        if (text === searchBy) return;
+
+        if (!multiSelect && selected) {
+            selected = null;
+        }
+
+        this.setState({searchBy: text, selected});
+    };
+
+    handleSelect = (person) => {
+        const {multiSelect} = this.props;
+        let {selected} = this.state;
+        let searchBy;
+
+        if (multiSelect) {
+            if (!_.find(selected, {id: person.id})) {
+                selected.push(person);
+            }
+        } else {
+            selected = person;
+            const inputEl = React.findDOMNode(this.refs.input.refs.input);
+            inputEl.focus();
+            setTimeout(function () {
+                inputEl.setSelectionRange(0, person.fullName.length);
+            }, 20);
+            searchBy = person.fullName;
+        }
+
+        this.setState({selected, searchBy});
     };
 
     render() {
-        const {mode, groups, teams, selectedGroup, searchBy} = this.state;
-        const {className} = this.props;
+        const {
+            mode,
+            groups,
+            teams,
+            selectedGroup,
+            searchBy,
+            selected
+        } = this.state;
+
+        const {className, multiSelect} = this.props;
 
         let personGroups = [];
 
         if (mode == 'full') {
             if (searchBy) {
+                // ищем по всем группам как в кратком режиме
+                if (selectedGroup.kind === 'frequent') {
+                    personGroupsForAll();
+                } else {
+                    personGroupForTeam();
+                }
             } else {
                 const grp = selectedGroup.kind == 'team' ? _.find(teams, {id: selectedGroup.id}) : groups[selectedGroup.kind];
-                personGroups = [{title: grp.kind == 'team' ? grp.name : titleByGroupKind(grp.kind), persons: grp.persons}];
+                if (grp.kind == 'team') {
+                    personGroupForTeam();
+                } else {
+                    personGroups = [{
+                        title: grp.kind == 'team' ? grp.name : titleByGroupKind(grp.kind),
+                        kind: grp.kind,
+                        persons: grp.persons
+                    }];
+                }
             }
         } else {
             if (searchBy) {
-
+                personGroupsForAll();
             } else {
-                personGroups = [{title: titleByGroupKind('frequent'), persons: groups.frequent.persons}];
+                personGroups = [{title: titleByGroupKind('frequent'), kind: 'frequent', persons: groups.frequent.persons}];
             }
         }
+
+        function personGroupForTeam() {
+            const grp = selectedGroup.kind == 'team' ? _.find(teams, {id: selectedGroup.id}) : groups[selectedGroup.kind];
+            const memberIds = _.values(groups).reduce((ids, {persons}) => {
+                persons.forEach((p)=> ids.push(p.id));
+                return ids;
+            }, []);
+
+            personGroups = [{
+                title: 'Members',
+                kind: 'members',
+                persons: grp.persons.filter((p)=>memberIds.indexOf(p.id) !== -1)
+            }, {
+                title: 'Non-members',
+                kind: 'non_members',
+                persons: grp.persons.filter((p)=>memberIds.indexOf(p.id) === -1)
+            }]
+        }
+
+        function personGroupsForAll() {
+            personGroups = _.values(groups)
+                .filter((g) => g.kind !== 'frequent')
+                .map((group) => ({title: titleByGroupKind(group.kind), kind: group.kind, persons: group.persons}));
+
+            const teamPersons = _.values(_.indexBy(_.flatten(_.pluck(teams, 'persons')), 'id'));
+            const participantPersonsIds =  _.pluck(_.flatten(_.pluck(personGroups, 'persons')), 'id');
+
+            personGroups.push({
+                title: 'Members of teams',
+                persons: teamPersons.filter((p) => participantPersonsIds.indexOf(p.id) !== -1)
+            });
+
+            personGroups.push({
+                title: 'Other',
+                persons: teamPersons.filter((p) => participantPersonsIds.indexOf(p.id) === -1)
+            });
+        }
+
+        if (searchBy) {
+            const re = new RegExp(searchBy, 'i');
+
+            personGroups = personGroups
+                .map((group) => {
+                    group.persons = group.persons.filter(({fullName}) => {
+                        return re.exec(fullName)
+                    });
+                    return group;
+                })
+        }
+        personGroups = personGroups.filter((group) => group.persons.length);
+
 
         const groupItems = _.pairs(groups).map(([kind, group]) => {
             let title = titleByGroupKind(kind);
 
             return (
                 <div ref={kind}
-                     className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_selected_${selectedGroup.kind==kind}`)}
+                     className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_selected_${selectedGroup && selectedGroup.kind==kind}`)}
                      onClick={this._handleGroupSelect.bind(this, kind)}>
                     <div className={`${b}__group-item-icon`}>
                         <div className={`b-icon-sc b-icon-sc_img_crown-on ${b}__${kind}-members-icon`}></div>
@@ -128,22 +241,24 @@ class PeopleSuggest extends ComponentBase {
         const teamItems = teams.map((team) => {
             const title = team.personal ? 'Personal contacts' : team.name;
             const abbr = title.split(/\s+/).map((s)=>s[0].toUpperCase()).join('');
-            const hasParticipants = team.hasParticipants ? (
-                <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
-                    <div className="b-icon-sc b-icon-sc_img_person"></div>
-                </div>
-            )
+            const hasParticipants = team.hasParticipants
+                ? (
+                    <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
+                        <div className="b-icon-sc b-icon-sc_img_person"></div>
+                    </div>
+                )
                 : '';
-            const hasMembers = team.hasMembers.length ? (
-                <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
-                    <div className="b-icon-sc b-icon-sc_img_person"></div>
-                </div>
-            )
+            const hasMembers = team.hasMembers.length
+                ? (
+                    <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
+                        <div className="b-icon-sc b-icon-sc_img_person"></div>
+                    </div>
+                )
                 : '';
 
             return (
                 <div ref='team'
-                     className={`${b}__group-item ${b}__group-item_id_${team.id} ${b}__group-item_selected_${selectedGroup.kind=='team' && selectedGroup.id == team.id}`}
+                     className={`${b}__group-item ${b}__group-item_id_${team.id} ${b}__group-item_selected_${selectedGroup && selectedGroup.kind=='team' && selectedGroup.id == team.id}`}
                      onClick={this._handleTeamSelect.bind(this, team.id)}>
                     <div style={{backgroundColor: team.avatar.color}} data-abbr={abbr}
                          className={`${b}__group-item-avatar b-avatar b-avatar_size_m b-avatar_empty_yes`}></div>
@@ -157,7 +272,7 @@ class PeopleSuggest extends ComponentBase {
         return (
             <div>
                 <div>
-                    <SuggestInput onChange={this._handleSearch}/>
+                    <SuggestInput ref='input' onChange={this._handleSearch} value={searchBy} selectedPersons={selected} multiSelect={multiSelect}/>
                 </div>
                 <div className={cx(className, b, `${b}_mode_${mode}`)}>
                     <div className={`${b}__content`}>
@@ -172,7 +287,7 @@ class PeopleSuggest extends ComponentBase {
                             {teamItems}
                         </div>
                         <div className={`${b}__right-column`}>
-                            <PersonList persons={personGroups}/>
+                            <PersonList persons={personGroups} onSelect={this.handleSelect}/>
                         </div>
                     </div>
 

@@ -102,4 +102,17 @@ export default [{
     "color": "#29B6F6",
     "email": null,
     "timezone": null
+}, {
+    "dismissal": null,
+    "isExternal": false,
+    "id": 1111,
+    "name": "John",
+    "surname": "Snow",
+    "fullName": "John Snow",
+    "firedAt": null,
+    "avatarUrl": "//static.synccloud.com/avatars/m/97df0a838e494747ba7a6e921ce5e3bc.jpg",
+    "position": "Team lead",
+    "color": "#29B6F6",
+    "email": null,
+    "timezone": null
 }]

@@ -34,6 +34,6 @@ export default {
         avatar: {
             color: '#4db6ac'
         },
-        persons: [25, 886, 4578]
+        persons: [25, 886, 4578, 1111]
     }]
 }
