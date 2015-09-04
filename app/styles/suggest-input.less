@@ -1,0 +1,15 @@
+.suggest-input {
+    color: green;
+    &__item {
+        &-input {
+            position: absolute;
+            left: -100000px;
+            width: 1px;
+        }
+
+        &:focus,
+        &_focused_true {
+            color: red;
+        }
+    }
+}

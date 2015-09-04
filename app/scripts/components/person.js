@@ -1,22 +1,27 @@
 import React from 'react';
-import {Component, PropTypes} from 'react';
+import mixins from 'es6-react-mixins'
+
+const {Component, PropTypes, addons} = React;
+const ComponentBase = mixins(addons.PureRenderMixin);
 
 const b = 'people-suggest';
 const noop = () => {};
 
-export default class Person extends Component {
+export default class Person extends ComponentBase {
 
     static propTypes = {
-        person: PropTypes.object.isRequired,
-        onClick: PropTypes.func
+        person: PropTypes.object.isRequired
     };
 
     render() {
 
-        const {person} = this.props;
+        const {
+            person,
+            ...other
+        } = this.props;
 
         return (
-            <div className={`${b}__employee ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop}>
+            <div {...other} className={`${b}__employee ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop} >
 
                 <div className={`${b}__avatar`}>
                     <img

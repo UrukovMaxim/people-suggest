@@ -96,7 +96,7 @@ body {
   padding: 50px;
 }
 .suggest1 {
-  top: 50px;
+  top: 0px;
 }
 
 /**
@@ -297,4 +297,17 @@ body {
 
 .person__name {
   font-weight: bold;
+}
+
+.suggest-input {
+  color: green;
+}
+.suggest-input__item-input {
+  position: absolute;
+  left: -100000px;
+  width: 1px;
+}
+.suggest-input__item:focus,
+.suggest-input__item_focused_true {
+  color: red;
 }

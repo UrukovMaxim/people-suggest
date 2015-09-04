@@ -10,8 +10,10 @@ const App = React.createClass({
   render: function() {
     return (
         <div>
-            <Suggest className='suggest1' multiSelect={true}/>
-
+            <h1>Single</h1>
+            <Suggest key='single' className='suggest1'/>
+            <h1>Multi</h1>
+            <Suggest key='multi' className='suggest1' multiSelect={true}/>
         </div>
     );
   }
@@ -19,4 +21,3 @@ const App = React.createClass({
 
 
 React.render(<App />, document.getElementById('app'));
-

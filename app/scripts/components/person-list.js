@@ -20,6 +20,7 @@ export default class PersonList extends Component {
     render() {
         const {persons, className} = this.props;
 
+        console.warn(persons);
         const items = persons.map((personGroup) => (
             <div>
                 <div className={`${b}__group-title`}>{personGroup.title}</div>

@@ -8,7 +8,7 @@ import SuggestStore from '../stores/suggest';
 import PersonActions from '../actions/person';
 import PersonList from '../components/person-list';
 import SuggestInput from '../components/suggest-input';
-import {List, Map} from 'immutable';
+import Immutable, {List, Map} from 'immutable';
 
 const cx = React.addons.classSet;
 const ComponentBase = mixins(ListenerMixin);
@@ -16,7 +16,7 @@ const b = 'people-suggest';
 const DEFAULT_GROUP = 'frequent';
 
 function getState() {
-    const allGroups = SuggestStore.getState().groups;
+    const allGroups = SuggestStore.getState().groups.map(_.clone);
     const allPersons = PersonStore.getState().persons;
 
     const groups = ['frequent', 'project_participants', 'project_members', 'team_members', 'team_participants', 'task_members']
@@ -106,9 +106,10 @@ class PeopleSuggest extends ComponentBase {
         let {selected} = this.state;
         let searchBy;
 
+        console.warn('selected', person);
         if (multiSelect) {
             if (!_.find(selected, {id: person.id})) {
-                selected.push(person);
+                selected = selected.concat(person);
             }
         } else {
             selected = person;
@@ -123,6 +124,18 @@ class PeopleSuggest extends ComponentBase {
         this.setState({selected, searchBy});
     };
 
+    _handleRemoveSelected = (p) => {
+        let {selected} = this.state;
+
+        if (_.isArray(selected) && selected.indexOf(p) !== -1) {
+            selected = _.without(selected, p);
+        } else if (selected == p) {
+            selected = null;
+        }
+
+        this.setState({selected});
+    };
+
     render() {
         const {
             mode,
@@ -133,7 +146,8 @@ class PeopleSuggest extends ComponentBase {
             selected
         } = this.state;
 
-        const {className, multiSelect} = this.props;
+        console.warn('render suggest', this.state);
+        const {className} = this.props;
 
         let personGroups = [];
 
@@ -272,7 +286,11 @@ class PeopleSuggest extends ComponentBase {
         return (
             <div>
                 <div>
-                    <SuggestInput ref='input' onChange={this._handleSearch} value={searchBy} selectedPersons={selected} multiSelect={multiSelect}/>
+                    <SuggestInput ref='input'
+                                  onChange={this._handleSearch}
+                                  onRemoveSelected={this._handleRemoveSelected}
+                                  value={searchBy}
+                                  selectedPersons={selected}/>
                 </div>
                 <div className={cx(className, b, `${b}_mode_${mode}`)}>
                     <div className={`${b}__content`}>
