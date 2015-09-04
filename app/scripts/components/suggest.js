@@ -248,7 +248,7 @@ class PeopleSuggest extends ComponentBase {
                     </div>
                 )
                 : '';
-            const hasMembers = team.hasMembers.length
+            const hasMembers = team.hasMembers
                 ? (
                     <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
                         <div className="b-icon-sc b-icon-sc_img_person"></div>
