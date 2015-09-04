@@ -11,6 +11,7 @@
     background-color: #fff;
     box-shadow: 0 2px 6px 0 fade(#252730, 50%);
     display: inline-block;
+
     &__content {
         display: flex;;
         flex-direction: row;
@@ -97,96 +98,19 @@
     }
 
     &__frequent-members-icon,
-    &__project-members-icon {
+    &__project-members-icon,
+    &__person-icon_is-team-participant_true {
         color: #29b6f6;
     }
 
-    &__project-participants-icon {
+    &__project-participants-icon,
+    &__person-icon_is-team-member_true {
         color: #b2bac9;
-    }
-
-    /**Правый блок**/
-
-    &__group-name {
-        padding: 16px;
-        color: #949FB1;
-        font-size: 14px;
-
-        &:not(:first-child) {
-            margin-top: 8px;
-        }
-    }
-
-    &__employee {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-        cursor: pointer;
-        position: relative;
-        width: 100%;
-        padding: 12px @padding-right 12px @padding-left;
-        font-size: 12px;
-
-        &_selected_true {
-
-            @{b}__selected-avatar-img {
-                display: block;
-            }
-        }
-
-        &:hover {
-            background-color: #f1f4f8;
-        }
-    }
-
-    &__selected-avatar-img {
-        display: none;
-        background-color: #33acfe;
-    }
-
-    &__avatar-img,
-    &__selected-avatar-img {
-        position: absolute;
-    }
-
-    &__selected-avatar-icon {
-        font-size: 16px;
-        color: #fff;
-    }
-
-    &__avatar {
-        .size(32px, 32px);
-        .absolute(12px, 0, 0, 16px);
-    }
-
-    &__info-wrap {
-        width: 100%;
-        padding-right: 2px;
-        overflow: hidden;
-    }
-
-    &__employee-name {
-        color: #2b303a;
-        margin-bottom: 4px;
-    }
-
-    &__employee-info,
-    &__personal-contact {
-        color: #949fb1;
-        font-size: 11px;
     }
 
     &__person-icon {
         font-size: 14px;
         padding-left: 8px;
         margin: auto;
-    }
-
-    &__person-icon_is-team-participant_true {
-        color: #29b6f6;
-    }
-
-    &__person-icon_is-team-member_true {
-        color: #b2bac9;
     }
 }

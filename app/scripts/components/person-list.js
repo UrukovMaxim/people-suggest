@@ -17,6 +17,7 @@ export default class PersonList extends Component {
         }
     };
 
+
     render() {
         const {persons, className} = this.props;
 
@@ -27,7 +28,6 @@ export default class PersonList extends Component {
                                                             onClick={this._handlePersonSelect.bind(this, p)}/>)}
             </div>
         ));
-
 
         return (
             <div className={cx(b, className)}>
