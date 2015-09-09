@@ -212,11 +212,11 @@ body {
 }
 .people-suggest__frequent-icon,
 .people-suggest__project_members-icon,
-.people-suggest__person-icon_is-team-participant_true {
+.people-suggest__person-icon_is-team-member_true {
   color: #29b6f6;
 }
 .people-suggest__project_participants-icon,
-.people-suggest__person-icon_is-team-member_true {
+.people-suggest__person-icon_is-team-participant_true {
   color: #b2bac9;
 }
 .people-suggest__person-icon {
@@ -308,10 +308,10 @@ body {
   margin: auto;
 }
 .person-list__person-icon_is-team-participant_true {
-  color: #29b6f6;
+  color: #b2bac9;
 }
 .person-list__person-icon_is-team-member_true {
-  color: #b2bac9;
+  color: #29b6f6;
 }
 
 .person__name {

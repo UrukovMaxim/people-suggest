@@ -19,9 +19,24 @@ export default class Person extends ComponentBase {
             ...other
         } = this.props;
 
+        let groupParticipantIcon = person.isGroupParticipant
+            ? (
+                <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
+                    <div className={'b-icon-sc b-icon-sc_img_person'}></div>
+                </div>
+            )
+            : '';
+
+        let groupMemberIcon = person.isGroupMember
+            ? (
+                <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
+                    <div className={'b-icon-sc b-icon-sc_img_person'}></div>
+                </div>
+            )
+            : '';
+
         return (
             <div {...other} className={`${b}__employee ${b}__employee_selected_${person.isSelected} ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop} >
-
                 <div className={`${b}__avatar`}>
                     <img
                         src={person.avatarUrl}
@@ -36,12 +51,8 @@ export default class Person extends ComponentBase {
                         <div className={`${b}__employee-name`}>{person.fullName}</div>
                         <div className={`${b}__employee-info`}>{person.position}</div>
                     </div>
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
-                        <div className={'b-icon-sc b-icon-sc_img_person'}></div>
-                    </div>
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
-                        <div className={'b-icon-sc b-icon-sc_img_person'}></div>
-                    </div>
+                {groupParticipantIcon}
+                {groupMemberIcon}
             </div>
         )
     }

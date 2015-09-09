@@ -32,11 +32,33 @@ function getState() {
     const teams = _.where(allGroups, {kind: 'team'}).map((team) => {
         const participantsGroup = groups['project_participants'] || groups['team_participants'];
         const membersGroup = groups['project_members'] || groups['team_members'];
-        team.hasParticipants = !!participantsGroup && _.intersection(participantsGroup.persons, team.persons);
-        team.hasMembers = !!membersGroup && _.intersection(membersGroup.persons, team.persons);
-        team.persons = team.persons.map((id) => allPersons[id]);
+
+        team.persons = team.persons.map((id) => {
+            let person = allPersons[id];
+
+            person.isGroupParticipant = !!participantsGroup && !!_.intersection([person], participantsGroup.persons).length;
+            person.isGroupMember = !!membersGroup && !!_.intersection([person], membersGroup.persons).length;
+
+            return person;
+        });
+
         return team;
     });
+
+    function prepareGroupsAndTeams(list) {
+        _.map(list, ((item) => {
+            const participantsGroup = groups['project_participants'] || groups['team_participants'];
+            const membersGroup = groups['project_members'] || groups['team_members'];
+
+            item.hasParticipants = !!participantsGroup && _.intersection(participantsGroup.persons, item.persons);
+            item.hasMembers = !!membersGroup && _.intersection(membersGroup.persons, item.persons);
+
+            return item;
+        }));
+    }
+
+    prepareGroupsAndTeams(groups);
+    prepareGroupsAndTeams(teams);
 
     return _.assign({
         groups,
@@ -189,11 +211,11 @@ class PeopleSuggest extends ComponentBase {
             personGroups = [{
                 title: 'Members',
                 kind: 'members',
-                persons: grp.persons.filter((p)=>memberIds.indexOf(p.id) !== -1)
+                persons: grp.persons.filter((p) => memberIds.indexOf(p.id) !== -1)
             }, {
                 title: 'Non-members',
                 kind: 'non_members',
-                persons: grp.persons.filter((p)=>memberIds.indexOf(p.id) === -1)
+                persons: grp.persons.filter((p) => memberIds.indexOf(p.id) === -1)
             }]
         }
 
@@ -244,11 +266,13 @@ class PeopleSuggest extends ComponentBase {
 
         const groupItems = _.pairs(groups).map(([kind, group]) => {
             let title = titleByGroupKind(kind);
-            let icon = getIconByGroup(kind);
+            let icon = getIconByGroupKind(kind);
             let htmlIconForGroup = icon
-                ? <div className={`${b}__group-item-icon`}>
-                    <div className={`b-icon-sc b-icon-sc_img_${icon} ${b}__${kind}-icon`}></div>
-                </div>
+                ? (
+                    <div className={`${b}__group-item-icon`}>
+                        <div className={`b-icon-sc b-icon-sc_img_${icon} ${b}__${kind}-icon`}></div>
+                    </div>
+                )
                 : '';
 
             return (
@@ -257,12 +281,8 @@ class PeopleSuggest extends ComponentBase {
                      onClick={this._handleGroupSelect.bind(this, kind)}>
                     {htmlIconForGroup}
                     <div className={`${b}__group-info`}>{title} · {group.persons.length}</div>
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
-                        <div className="b-icon-sc b-icon-sc_img_person"></div>
-                    </div>
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
-                        <div className="b-icon-sc b-icon-sc_img_person"></div>
-                    </div>
+                    {getIconForParticipantsGroup(group)}
+                    {getIconForMembersGroup(group)}
                 </div>
             )
         });
@@ -270,20 +290,6 @@ class PeopleSuggest extends ComponentBase {
         const teamItems = teams.map((team) => {
             const title = team.personal ? 'Personal contacts' : team.name;
             const abbr = title.split(/\s+/).map((s)=>s[0].toUpperCase()).join('');
-            const hasParticipants = team.hasParticipants
-                ? (
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
-                        <div className="b-icon-sc b-icon-sc_img_person"></div>
-                    </div>
-                )
-                : '';
-            const hasMembers = team.hasMembers
-                ? (
-                    <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
-                        <div className="b-icon-sc b-icon-sc_img_person"></div>
-                    </div>
-                )
-                : '';
 
             return (
                 <div ref='team'
@@ -292,8 +298,8 @@ class PeopleSuggest extends ComponentBase {
                     <div style={{backgroundColor: team.avatar.color}} data-abbr={abbr}
                          className={`${b}__group-item-avatar b-avatar b-avatar_size_m b-avatar_empty_yes`}></div>
                     <div className={`${b}__group-info`}>{title} · {team.persons.length}</div>
-                    {hasParticipants}
-                    {hasMembers}
+                    {getIconForParticipantsGroup(team)}
+                    {getIconForMembersGroup(team)}
                 </div>
             )
         });
@@ -332,10 +338,30 @@ class PeopleSuggest extends ComponentBase {
             </div>
         );
 
-        function getIconByGroup(kind) {
+        function getIconByGroupKind(kind) {
             let icons = {frequent: 'frequent', project_participants: 'person', project_members: 'person'};
 
             return icons[kind] || '';
+        }
+
+        function getIconForParticipantsGroup(group) {
+            return (group.hasParticipants && group.hasParticipants.length)
+                ? (
+                    <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
+                        <div className="b-icon-sc b-icon-sc_img_person"></div>
+                    </div>
+                )
+                : '';
+        }
+
+        function getIconForMembersGroup(group) {
+            return (group.hasMembers && group.hasMembers.length)
+                ? (
+                    <div className={`${b}__person-icon ${b}__person-icon_is-team-member_true`}>
+                        <div className="b-icon-sc b-icon-sc_img_person"></div>
+                    </div>
+                )
+                : '';
         }
     }
 }
