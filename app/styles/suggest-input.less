@@ -1,0 +1,58 @@
+@b: ~'.suggest-input';
+
+@{b} {
+
+    &__item {
+        font-size: 12px;
+        height: 32px;
+        white-space: nowrap;
+        overflow: hidden;
+
+        &:not(:first-child) {
+            margin-top: 12px;
+        }
+
+        &-emp-name {
+        }
+
+        &-emp-team {
+            color: #949fb1;
+        }
+
+        &-remove-icon {
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 32px;
+            padding-left: 4px;
+        }
+
+        &-input {
+            position: absolute;
+            left: -100000px;
+            width: 1px;
+        }
+
+        &:focus,
+        &_focused_true {
+            color: red;
+        }
+
+        &_type_multi {
+
+            @{b}__item-avatar {
+                margin-right: 8px;
+            }
+        }
+
+        &_type_single {
+
+            @{b}__item-remove-icon {
+                display: none;
+            }
+
+            @{b}__item-avatar {
+                margin-right: 16px;
+            }
+        }
+    }
+}

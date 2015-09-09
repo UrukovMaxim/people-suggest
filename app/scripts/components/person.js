@@ -1,21 +1,26 @@
 import React from 'react';
-import {Component, PropTypes} from 'react';
+import mixins from 'es6-react-mixins'
+
+const {Component, PropTypes, addons} = React;
+const ComponentBase = mixins(addons.PureRenderMixin);
 
 const b = 'person-list';
 const noop = () => {};
 
-export default class Person extends Component {
+export default class Person extends ComponentBase {
 
     static propTypes = {
-        person: PropTypes.object.isRequired,
-        onClick: PropTypes.func
+        person: PropTypes.object.isRequired
     };
 
     render() {
-        const {person} = this.props;
+        const {
+            person,
+            ...other
+        } = this.props;
 
         return (
-            <div className={`${b}__employee ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop}>
+            <div {...other} className={`${b}__employee ${b}__employee_selected_${person.isSelected} ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop} >
 
                 <div className={`${b}__avatar`}>
                     <img
@@ -23,7 +28,7 @@ export default class Person extends Component {
                         title={person.fullName} className={`b-avatar ${b}__avatar-img b-avatar_size_m`}/>
                     <div className={`${b}__selected-avatar-img b-avatar b-avatar_size_m b-avatar_empty_yes`}>
                         <div className={`${b}__selected-avatar-icon`}>
-                            <div className={'b-icon-sc b-icon-sc_img_person'}></div>
+                            <div className={'b-icon-sc b-icon-sc_img_check'}></div>
                         </div>
                     </div>
                 </div>

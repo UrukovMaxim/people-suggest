@@ -8,7 +8,7 @@ import SuggestStore from '../stores/suggest';
 import PersonActions from '../actions/person';
 import PersonList from '../components/person-list';
 import SuggestInput from '../components/suggest-input';
-import {List, Map} from 'immutable';
+import Immutable, {List, Map} from 'immutable';
 
 const cx = React.addons.classSet;
 const ComponentBase = mixins(ListenerMixin);
@@ -16,7 +16,7 @@ const b = 'people-suggest';
 const DEFAULT_GROUP = 'frequent';
 
 function getState() {
-    const allGroups = SuggestStore.getState().groups;
+    const allGroups = SuggestStore.getState().groups.map(_.clone);
     const allPersons = PersonStore.getState().persons;
 
     const groups = ['frequent', 'project_participants', 'project_members', 'team_members', 'team_participants', 'task_members']
@@ -106,9 +106,10 @@ class PeopleSuggest extends ComponentBase {
         let {selected} = this.state;
         let searchBy;
 
+        console.warn('selected', person);
         if (multiSelect) {
             if (!_.find(selected, {id: person.id})) {
-                selected.push(person);
+                selected = selected.concat(person);
             }
         } else {
             selected = person;
@@ -123,6 +124,18 @@ class PeopleSuggest extends ComponentBase {
         this.setState({selected, searchBy});
     };
 
+    _handleRemoveSelected = (p) => {
+        let {selected} = this.state;
+
+        if (_.isArray(selected) && selected.indexOf(p) !== -1) {
+            selected = _.without(selected, p);
+        } else if (selected == p) {
+            selected = null;
+        }
+
+        this.setState({selected});
+    };
+
     render() {
         const {
             mode,
@@ -133,7 +146,8 @@ class PeopleSuggest extends ComponentBase {
             selected
         } = this.state;
 
-        const {className, multiSelect} = this.props;
+        console.warn('render suggest', this.state);
+        const {className} = this.props;
 
         let personGroups = [];
 
@@ -211,21 +225,37 @@ class PeopleSuggest extends ComponentBase {
                         return re.exec(fullName)
                     });
                     return group;
-                })
+                });
         }
-        personGroups = personGroups.filter((group) => group.persons.length);
 
+        personGroups = personGroups
+            .filter((group) => group.persons.length)
+            .map((group) => {
+                let selectedEmp = _.isArray(selected) ? selected : [selected];
+
+                group.persons = group.persons.map((emp) => {
+                    emp.isSelected = !!_.intersection([emp], selectedEmp).length;
+
+                    return emp;
+                });
+
+                return group;
+        });
 
         const groupItems = _.pairs(groups).map(([kind, group]) => {
             let title = titleByGroupKind(kind);
+            let icon = getIconByGroup(kind);
+            let htmlIconForGroup = icon
+                ? <div className={`${b}__group-item-icon`}>
+                    <div className={`b-icon-sc b-icon-sc_img_${icon} ${b}__${kind}-icon`}></div>
+                </div>
+                : '';
 
             return (
                 <div ref={kind}
                      className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_selected_${selectedGroup && selectedGroup.kind==kind}`)}
                      onClick={this._handleGroupSelect.bind(this, kind)}>
-                    <div className={`${b}__group-item-icon`}>
-                        <div className={`b-icon-sc b-icon-sc_img_crown-on ${b}__${kind}-members-icon`}></div>
-                    </div>
+                    {htmlIconForGroup}
                     <div className={`${b}__group-info`}>{title} · {group.persons.length}</div>
                     <div className={`${b}__person-icon ${b}__person-icon_is-team-participant_true`}>
                         <div className="b-icon-sc b-icon-sc_img_person"></div>
@@ -236,7 +266,6 @@ class PeopleSuggest extends ComponentBase {
                 </div>
             )
         });
-
 
         const teamItems = teams.map((team) => {
             const title = team.personal ? 'Personal contacts' : team.name;
@@ -272,7 +301,11 @@ class PeopleSuggest extends ComponentBase {
         return (
             <div>
                 <div>
-                    <SuggestInput ref='input' onChange={this._handleSearch} value={searchBy} selectedPersons={selected} multiSelect={multiSelect}/>
+                    <SuggestInput ref='input'
+                                  onChange={this._handleSearch}
+                                  onRemoveSelected={this._handleRemoveSelected}
+                                  value={searchBy}
+                                  selectedPersons={selected}/>
                 </div>
                 <div className={cx(className, b, `${b}_mode_${mode}`)}>
                     <div className={`${b}__content`}>
@@ -292,11 +325,18 @@ class PeopleSuggest extends ComponentBase {
                     </div>
 
                     <div className={`${b}__toggle-button`} onClick={this._handleChangeMode}>
-                        <div className="b-icon-sc b-icon-sc_img_close-box"></div>
+                        <div className="b-icon-sc b-icon-sc_img_minimize"></div>
+
                     </div>
                 </div>
             </div>
-        )
+        );
+
+        function getIconByGroup(kind) {
+            let icons = {frequent: 'frequent', project_participants: 'person', project_members: 'person'};
+
+            return icons[kind] || '';
+        }
     }
 }
 
