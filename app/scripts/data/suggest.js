@@ -11,7 +11,7 @@ export default {
         persons: [1, 25, 886]
     }, {
         kind: 'project_participants',
-        persons: [886]
+        persons: [1]
     }, {
         kind: 'project_members',
         persons: [4167]
@@ -26,7 +26,7 @@ export default {
             image: "//static.synccloud.com/avatars/m/549fc3c69cc04bc7ade63e2a479436c6.jpg",
             color: '#7986cb'
         },
-        persons: [1, 25, 886, 4167, 4578]
+        persons: [25, 886, 4167, 4578, 2000, 3000, 4000]
     }, {
         id: 2,
         kind: 'team',

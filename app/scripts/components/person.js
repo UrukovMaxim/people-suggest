@@ -16,6 +16,7 @@ export default class Person extends ComponentBase {
     render() {
         const {
             person,
+            hover,
             ...other
         } = this.props;
 
@@ -36,7 +37,7 @@ export default class Person extends ComponentBase {
             : '';
 
         return (
-            <div {...other} className={`${b}__employee ${b}__employee_selected_${person.isSelected} ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop} >
+            <div {...other} className={`${b}__employee ${b}__employee_hover_${person.isHover}  ${b}__employee_selected_${person.isSelected} ${b}__employee_id_${person.id}`} onClick={this.props.onClick || noop} >
                 <div className={`${b}__avatar`}>
                     <img
                         src={person.avatarUrl}

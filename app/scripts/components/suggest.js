@@ -14,6 +14,9 @@ const cx = React.addons.classSet;
 const ComponentBase = mixins(ListenerMixin);
 const b = 'people-suggest';
 const DEFAULT_GROUP = 'frequent';
+const DEFAULT_HOVER_PERSON = 0;
+const DEFAULT_HOVER_GROUP = -1;
+const DEFAULT_FOCUS_COLUMN = 'right';
 
 function getState() {
     const allGroups = SuggestStore.getState().groups.map(_.clone);
@@ -84,6 +87,9 @@ class PeopleSuggest extends ComponentBase {
 
     state = _.assign(getState(), {
         selectedGroup: {kind: DEFAULT_GROUP},
+        indexHoverPerson: DEFAULT_HOVER_PERSON,
+        indexHoverGroup: DEFAULT_HOVER_GROUP,
+        focusColumn: DEFAULT_FOCUS_COLUMN,
         mode: 'full',
         selected: [],
         searchBy: ''
@@ -96,6 +102,82 @@ class PeopleSuggest extends ComponentBase {
         this.listenTo(SuggestStore, getState);
     }
 
+    _handleKeyDown = (key) => {
+        switch (key) {
+            case 'ArrowLeft':
+                this.setState({focusColumn: 'left', indexHoverPerson: -1, indexHoverGroup: 0});
+                break;
+            case 'ArrowRight':
+                this.setState({focusColumn: 'right', indexHoverGroup: -1, indexHoverPerson: 0});
+                break;
+            case 'ArrowUp':
+                this._moveIndexByOne(-1);
+                break;
+            case 'ArrowDown':
+                this._moveIndexByOne(1);
+                break;
+            case 'Escape':
+                console.log(key);
+                break;
+            case 'Enter':
+                this._handleEnterPress();
+                break;
+        }
+    };
+
+    _handleEnterPress = () => {
+        if (this.state.focusColumn === 'left') {
+            const selectGroup = this.leftColumnItems[this.state.indexHoverGroup];
+            const id = selectGroup.id;
+
+            this['_handle' + (id ? 'Team': 'Group') + 'Select'](id || selectGroup.kind);
+        } else {
+            const selectEmp = this.rightColumnItems[this.state.indexHoverPerson];
+            const empElem = React.findDOMNode(this.refs['person-list'].refs['item' + selectEmp.id]);
+
+            this[empElem.classList.contains('person-list__employee_selected_true')
+                ? '_handleRemoveSelected'
+                : 'handleSelect'
+                ](selectEmp);
+        }
+    };
+
+    _moveIndexByOne = (index) => {
+        let {
+            focusColumn,
+            indexHoverPerson,
+            indexHoverGroup
+        } = this.state;
+
+        const listLength = this[focusColumn + 'ColumnItems'].length;
+        const $list = $(React.findDOMNode(this.refs['person-list']));
+        const $listElemHeight = $list.find('.person-list__employee').eq(0).height();
+        const prevScroll = $list.scrollTop();
+        let scrollTop;
+
+        if (!listLength) return;
+
+        const prevIndex = focusColumn === 'left' ? indexHoverGroup : indexHoverPerson;
+        let newIndex = prevIndex + index;
+
+        if (listLength === newIndex) {
+            scrollTop = 0;
+            newIndex = 0;
+        } else if (newIndex < 0) {
+            scrollTop = 100000;
+            newIndex = listLength - 1;
+        } else {
+            scrollTop = prevScroll + (index === 1 ? $listElemHeight : -$listElemHeight);
+        }
+
+        let newState = {};
+        newState[focusColumn === 'left' ? 'indexHoverGroup' : 'indexHoverPerson'] = newIndex;
+
+        focusColumn === 'right' && $list.scrollTop(scrollTop);
+
+        this.setState(newState);
+    };
+
     _handleChangeMode = () => {
         const mode = this.state.mode == 'short' ? 'full' : 'short';
 
@@ -103,11 +185,11 @@ class PeopleSuggest extends ComponentBase {
     };
 
     _handleGroupSelect = (kind) => {
-        this.setState({selectedGroup: {kind}})
+        this.setState({selectedGroup: {kind}, indexHoverPerson: 0, indexHoverGroup: -1, focusColumn: 'right'});
     };
 
     _handleTeamSelect = (id) => {
-        this.setState({selectedGroup: {kind: 'team', id}})
+        this.setState({selectedGroup: {kind: 'team', id}, indexHoverPerson: 0, indexHoverGroup: -1, focusColumn: 'right'});
     };
 
     _handleSearch = (text) => {
@@ -120,7 +202,7 @@ class PeopleSuggest extends ComponentBase {
             selected = null;
         }
 
-        this.setState({searchBy: text, selected});
+        this.setState({searchBy: text, selected, indexHoverPerson: 0});
     };
 
     handleSelect = (person) => {
@@ -165,8 +247,12 @@ class PeopleSuggest extends ComponentBase {
             teams,
             selectedGroup,
             searchBy,
-            selected
+            selected,
+            indexHoverPerson,
+            indexHoverGroup
         } = this.state;
+
+        this.leftColumnItems = _.flatten([_.values(groups), teams]);
 
         console.warn('render suggest', this.state);
         const {className} = this.props;
@@ -250,18 +336,19 @@ class PeopleSuggest extends ComponentBase {
                 });
         }
 
-        personGroups = personGroups
-            .filter((group) => group.persons.length)
-            .map((group) => {
-                let selectedEmp = _.isArray(selected) ? selected : [selected];
+        personGroups = personGroups.filter((group) => group.persons.length);
+        this.rightColumnItems = _.flatten(_.pluck(personGroups, 'persons'), true);
 
-                group.persons = group.persons.map((emp) => {
-                    emp.isSelected = !!_.intersection([emp], selectedEmp).length;
+        personGroups = personGroups.map((group) => {
+            let selectedEmp = _.isArray(selected) ? selected : [selected];
 
-                    return emp;
-                });
+            group.persons = group.persons.map((emp) => {
+                emp.isSelected = !!_.intersection([emp], selectedEmp).length;
+                emp.isHover = emp === this.rightColumnItems[indexHoverPerson];
+                return emp;
+            });
 
-                return group;
+            return group;
         });
 
         const groupItems = _.pairs(groups).map(([kind, group]) => {
@@ -277,7 +364,7 @@ class PeopleSuggest extends ComponentBase {
 
             return (
                 <div ref={kind}
-                     className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_selected_${selectedGroup && selectedGroup.kind==kind}`)}
+                     className={cx(`${b}__group-item ${b}_group-item_id_frequent ${b}__group-item_hover_${group === this.leftColumnItems[indexHoverGroup]} ${b}__group-item_selected_${selectedGroup && selectedGroup.kind==kind}`)}
                      onClick={this._handleGroupSelect.bind(this, kind)}>
                     {htmlIconForGroup}
                     <div className={`${b}__group-info`}>{title} · {group.persons.length}</div>
@@ -293,7 +380,7 @@ class PeopleSuggest extends ComponentBase {
 
             return (
                 <div ref='team'
-                     className={`${b}__group-item ${b}__group-item_id_${team.id} ${b}__group-item_selected_${selectedGroup && selectedGroup.kind=='team' && selectedGroup.id == team.id}`}
+                     className={`${b}__group-item ${b}__group-item_id_${team.id} ${b}__group-item_hover_${team === this.leftColumnItems[indexHoverGroup]} ${b}__group-item_selected_${selectedGroup && selectedGroup.kind=='team' && selectedGroup.id == team.id}`}
                      onClick={this._handleTeamSelect.bind(this, team.id)}>
                     <div style={{backgroundColor: team.avatar.color}} data-abbr={abbr}
                          className={`${b}__group-item-avatar b-avatar b-avatar_size_m b-avatar_empty_yes`}></div>
@@ -309,6 +396,7 @@ class PeopleSuggest extends ComponentBase {
                 <div>
                     <SuggestInput ref='input'
                                   onChange={this._handleSearch}
+                                  onKeyDown={this._handleKeyDown}
                                   onRemoveSelected={this._handleRemoveSelected}
                                   value={searchBy}
                                   selectedPersons={selected}/>
@@ -326,7 +414,10 @@ class PeopleSuggest extends ComponentBase {
                             {teamItems}
                         </div>
                         <div className={`${b}__right-column`}>
-                            <PersonList persons={personGroups} onSelect={this.handleSelect}/>
+                            <PersonList
+                                ref='person-list'
+                                persons={personGroups}
+                                onSelect={this.handleSelect}/>
                         </div>
                     </div>
 

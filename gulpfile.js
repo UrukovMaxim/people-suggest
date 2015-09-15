@@ -167,25 +167,14 @@ gulp.task('extras', function() {
 // Watch
 gulp.task('watch', ['html', 'fonts', 'bundle'], function() {
 
-    browserSync({
-        notify: false,
-        logPrefix: 'BS',
-        // Run as an https by uncommenting 'https: true'
-        // Note: this uses an unsigned certificate which on first access
-        //       will present a certificate warning in the browser.
-        // https: true,
-        server: ['dist', 'app']
-    });
-
     // Watch .json files
     gulp.watch('app/scripts/**/*.json', ['json']);
 
+    gulp.watch('app/scripts/**/*.js', ['scripts']);
     // Watch .html files
     gulp.watch('app/*.html', ['html']);
 
     gulp.watch(['app/styles/**/*.less', 'app/styles/**/*.css'], ['styles', 'scripts', reload]);
-
-
 
     // Watch image files
     gulp.watch('app/images/**/*', reload);
@@ -197,6 +186,18 @@ gulp.task('build', ['html', 'buildBundle', 'images', 'fonts', 'extras'], functio
         .pipe($.uglify())
         .pipe($.stripDebug())
         .pipe(gulp.dest('dist/scripts'));
+});
+
+gulp.task('start-server', function() {
+    browserSync({
+        notify: false,
+        logPrefix: 'BS',
+        // Run as an https by uncommenting 'https: true'
+        // Note: this uses an unsigned certificate which on first access
+        //       will present a certificate warning in the browser.
+        // https: true,
+        server: ['dist', 'app']
+    });
 });
 
 // Default task

@@ -7,6 +7,8 @@
 @b: ~'.person-list';
 
 @{b} {
+    max-height: 300px;
+    overflow-y: auto;
 
     &__group-title {
         padding: 16px;
@@ -39,7 +41,8 @@
             }
         }
 
-        &:hover {
+        &:hover,
+        &_hover_true {
             background-color: #f1f4f8;
         }
     }
@@ -61,7 +64,7 @@
 
     &__avatar {
         .size(32px, 32px);
-        .absolute(12px, 0, 0, 16px);
+        .absolute(16px, 0, 0, 16px);
     }
 
     &__info-wrap {

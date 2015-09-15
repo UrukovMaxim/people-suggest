@@ -25,8 +25,10 @@ export default class PersonList extends Component {
         const items = persons.map((personGroup) => (
             <div>
                 <div className={`${b}__group-title`}>{personGroup.title}</div>
-                {personGroup.persons.map((p) => <PersonItem key={p.id} person={p}
-                                                            onClick={this._handlePersonSelect.bind(this, p)}/>)}
+                {personGroup.persons.map((p, i) => <PersonItem ref={'item' + p.id}
+                                                               key={p.id}
+                                                               person={p}
+                                                               onClick={this._handlePersonSelect.bind(this, p)}/>)}
             </div>
         ));
 

@@ -33,10 +33,11 @@ export default class SuggestInput extends ComponentBase {
     };
 
     _handleKeyDown = ({key}) => {
-        if (key == 'ArrowLeft') {
-            //this.refs.input.getDOMNode().blur();
-            this._items.length && _.last(this._items).getDOMNode().focus();
-        }
+        this.props.onKeyDown && this.props.onKeyDown(key);
+        //if (key == 'ArrowLeft') {
+        //    //this.refs.input.getDOMNode().blur();
+        //    this._items.length && _.last(this._items).getDOMNode().focus();
+        //}
     };
 
     _handleItemFocus = (p) => {
