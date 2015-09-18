@@ -2,6 +2,23 @@
 
 @{b} {
 
+
+    &__input {
+        font-size: 12px;
+        height: 28px;
+        border: 0;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &__items-wrap {
+        border-bottom: 2px solid #00b3ee;
+        padding-bottom: 5px;
+        width: 400px;
+    }
+
     &__item {
         font-size: 12px;
         height: 32px;
@@ -42,6 +59,13 @@
             @{b}__item-avatar {
                 margin-right: 8px;
             }
+
+            @{b}__input {
+
+                &:not(:last-child) {
+                    display: none;
+                }
+            }
         }
 
         &_type_single {
@@ -53,6 +77,17 @@
             @{b}__item-avatar {
                 margin-right: 16px;
             }
+
+            @{b}__item-emp-name {
+                display: none;
+            }
+        }
+    }
+
+    &__item_type_multi:not(:last-of-type) {
+
+        @{b}__input {
+            display: none;
         }
     }
 }

@@ -174,7 +174,7 @@ gulp.task('watch', ['html', 'fonts', 'bundle'], function() {
     // Watch .html files
     gulp.watch('app/*.html', ['html']);
 
-    gulp.watch(['app/styles/**/*.less', 'app/styles/**/*.css'], ['styles', 'scripts', reload]);
+    gulp.watch(['app/styles/**/*.less', 'app/styles/**/*.css'], ['html', 'fonts', 'bundle']);
 
     // Watch image files
     gulp.watch('app/images/**/*', reload);

@@ -1,13 +1,14 @@
 import React from 'react/addons';
 import _ from 'lodash';
 import {Component, PropTypes} from 'react';
-import mixins from 'es6-react-mixins'
+import mixins from 'es6-react-mixins';
 import ListenerMixin from 'alt/mixins/ListenerMixin';
 import PersonStore from '../stores/person';
 import SuggestStore from '../stores/suggest';
 import PersonActions from '../actions/person';
 import PersonList from '../components/person-list';
 import SuggestInput from '../components/suggest-input';
+import Avatar from '../components/suggest-input';
 import Immutable, {List, Map} from 'immutable';
 
 const cx = React.addons.classSet;
@@ -217,11 +218,6 @@ class PeopleSuggest extends ComponentBase {
             }
         } else {
             selected = person;
-            const inputEl = React.findDOMNode(this.refs.input.refs.input);
-            inputEl.focus();
-            setTimeout(function () {
-                inputEl.setSelectionRange(0, person.fullName.length);
-            }, 20);
             searchBy = person.fullName;
         }
 
@@ -383,7 +379,7 @@ class PeopleSuggest extends ComponentBase {
                      className={`${b}__group-item ${b}__group-item_id_${team.id} ${b}__group-item_hover_${team === this.leftColumnItems[indexHoverGroup]} ${b}__group-item_selected_${selectedGroup && selectedGroup.kind=='team' && selectedGroup.id == team.id}`}
                      onClick={this._handleTeamSelect.bind(this, team.id)}>
                     <div style={{backgroundColor: team.avatar.color}} data-abbr={abbr}
-                         className={`${b}__group-item-avatar b-avatar b-avatar_size_m b-avatar_empty_yes`}></div>
+                         className={`${b}__group-item-avatar b-avatar b-avatar_size_m b-avatar_empty_true`}></div>
                     <div className={`${b}__group-info`}>{title} · {team.persons.length}</div>
                     {getIconForParticipantsGroup(team)}
                     {getIconForMembersGroup(team)}

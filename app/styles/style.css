@@ -248,10 +248,10 @@
   font-size: 18px;
   text-align: center;
 }
-.b-avatar_empty_yes {
+.b-avatar_empty_true {
   text-align: center;
 }
-.b-avatar_empty_yes:before {
+.b-avatar_empty_true:before {
   color: #fff;
   text-transform: uppercase;
   content: attr(data-abbr);
@@ -1336,7 +1336,7 @@
 .b-canban-column-timeline_show-pinned_yes .b-canban-column-timeline__pinned-expander:before {
   content: "\e605";
 }
-.b-canban-column-timeline__pinned_not-empty_yes .b-canban-column-timeline__pinned-expander {
+.b-canban-column-timeline__pinned_not-empty_true .b-canban-column-timeline__pinned-expander {
   visibility: visible;
 }
 .b-canban-column-timeline__pinned-count,
@@ -6405,8 +6405,8 @@ img.jcrop-preview {
   width: 194px;
   height: 42px;
 }
-.b-logo_empty_yes {
-  background: url('../../images/b-logo_empty_yes.jpg') no-repeat center center;
+.b-logo_empty_true {
+  background: url('../../images/b-logo_empty_true.jpg') no-repeat center center;
   -moz-background-size: contain;
   background-size: contain;
   border-radius: 50%;

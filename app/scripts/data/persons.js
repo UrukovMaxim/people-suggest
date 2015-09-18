@@ -6,9 +6,9 @@ export default [{
     "surname": "Уруков",
     "fullName": "Андрей Уруков",
     "firedAt": null,
-    "avatarUrl": "//static.synccloud.com/avatars/m/32c77a26a8d6474397a92f082f0687e0.jpg",
+    //"avatarUrl": "//static.synccloud.com/avatars/m/32c77a26a8d6474397a92f082f0687e0.jpg",
     "position": "Руководитель IT-проектов",
-    "color": "#9CCC65",
+    //"color": "#9CCC65",
     "email": null,
     "timezone": null
 }, {
